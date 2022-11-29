@@ -17,13 +17,18 @@ def main():
     freq = generateFreq(hist)
     #print(freq)
     strHist = histToCsv(hist)
-    print(test)
+    #print(strHist)
     strFreq = histToCsv(freq)
-    print(strFreq)
+    #print(strFreq)
     #score = scoreWord("bless", freq)
     #score = scoreWordAddFreq("stony", freq)
-    #print(score)
+    word = getWord()
+    score = scoreLetterPos(word, hist, freq)
+    print(score)
 
+def getWord():
+    return input("Enter word to score:\n ")
+    
 def histToCsv(hist):
     strHist = ""
     for key in hist:
@@ -64,14 +69,29 @@ def scoreWordMulti(word, freq):
         score = score * freq[letter]
     return score
 
+#Adds all frequencies together for each letter
 def scoreWordAddFreq(word, freq):
     score = 0
     for letter in word:
         score = score + freq[letter]
     return score
 
-def scoreLetterPos(word, freq):
-    # % total occurrence * % occur in specific location
+def scoreLetterPos(word, hist, freq):
+    score = 10000000000
+    pos = 0
+    debug = False
+    for letter in word:
+        
+        percLoc = hist[letter][pos+1] / hist[letter][0]
+        if debug:
+            print(letter)
+            print(hist[letter])
+            print(freq[letter])
+            print(percLoc)
+        score = score * percLoc * freq[letter]
+        pos = pos + 1
+    return score
+    # % total occurrence * (% occur in specific location / 2)
 
 def generateFreq(histogram):
     percents = {}
