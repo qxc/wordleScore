@@ -10,24 +10,56 @@ def makeWordArray():
         words.append(trimmedWord.lower())
     print(words)
 
-def main():
-    #makeWordArray()
-    hist = makeHistogram()
-    #print(hist)
-    freq = generateFreq(hist)
-    #print(freq)
-    strHist = histToCsv(hist)
-    #print(strHist)
-    strFreq = histToCsv(freq)
-    #print(strFreq)
-    #score = scoreWord("bless", freq)
-    #score = scoreWordAddFreq("stony", freq)
+def getFreq():
+    freq = {}
+    for word in WORD_LIST:
+        for letter in word:
+            if letter in freq:
+                freq[letter] = freq[letter] + 1
+            else:
+                freq[letter] = 1
+    return freq
+
+def getLetterPerc(freq):
+    letterPerc = {}
+    for letter in freq:
+        letterPerc[letter] = round(freq[letter] / TOTAL_LETTERS, 4)
+    return letterPerc
+
+def scoreBasedOnFreq(debug):
+    freq = getFreq()
+    perc = getLetterPerc(freq)
+    if (debug):
+        print(freq)
+        print(perc)
     word = getWord()
-    score = scoreLetterPos(word, hist, freq)
-    print(score)
+    scoreMulti = scoreWordMulti(word, perc)
+    scoreAdd = scoreWordAddFreq(word, perc)
+    print(scoreMulti)
+    print(scoreAdd)
+
+def scoreBasedOnPosHist(debug):
+    hist = makeHistogram()
+    getPercHist(hist)
+    strHist = histToCsv(hist)
+    if (debug):
+        print(strHist)
+        print(hist)
+    word = getWord()
+    score = scoreLetterPos(word, hist)
+    print(score)    
+    
+def main():
+    #scoreBasedOnFreq(False)
+    scoreBasedOnPosHist(False)
+
+def getPercHist(hist):
+    for letter in hist:
+        hist[letter][6] = round(hist[letter][0] / TOTAL_LETTERS, 4)
+    return hist
 
 def getWord():
-    return input("Enter word to score:\n ")
+    return input("Enter word to score:\n ").lower()
     
 def histToCsv(hist):
     strHist = ""
@@ -49,7 +81,6 @@ def concatCommaStr(orig, num):
 
 def makeHistogram():
     letterHistogram = {}
-    #locHist = {}
     for word in WORD_LIST:
         letterPos = 1
         for letter in word:
@@ -58,13 +89,13 @@ def makeHistogram():
                 curLetter[0] = curLetter[0] + 1
                 curLetter[letterPos] = curLetter[letterPos] + 1
             else:
-                letterHistogram[letter] = [1,0,0,0,0,0]
+                letterHistogram[letter] = [1,0,0,0,0,0,0]
             letterPos += 1
     return letterHistogram
 
 #Multiplies % occurrence together by a big number to get a hopefully non-decimal score
 def scoreWordMulti(word, freq):
-    score = 10000000
+    score = 100000000
     for letter in word:
         score = score * freq[letter]
     return score
@@ -74,29 +105,22 @@ def scoreWordAddFreq(word, freq):
     score = 0
     for letter in word:
         score = score + freq[letter]
-    return score
+    return score*10
 
-def scoreLetterPos(word, hist, freq):
+def scoreLetterPos(word, hist):
     score = 10000000000
     pos = 0
     debug = False
     for letter in word:
-        
         percLoc = hist[letter][pos+1] / hist[letter][0]
         if debug:
             print(letter)
             print(hist[letter])
             print(freq[letter])
             print(percLoc)
-        score = score * percLoc * freq[letter]
+        score = score * percLoc * hist[letter][6]
         pos = pos + 1
     return score
     # % total occurrence * (% occur in specific location / 2)
-
-def generateFreq(histogram):
-    percents = {}
-    for letter in histogram:
-        percents[letter] = round(histogram[letter][0] / TOTAL_LETTERS, 4)
-    return percents
 
 main()
