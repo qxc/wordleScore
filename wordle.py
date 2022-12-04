@@ -51,7 +51,7 @@ def scoreBasedOnPosHist(debug):
     
 def main():
     #scoreBasedOnFreq(False)
-    scoreBasedOnPosHist(False)
+    #scoreBasedOnPosHist(False)
 
 def getPercHist(hist):
     for letter in hist:
@@ -118,7 +118,7 @@ def scoreLetterPos(word, hist):
             print(hist[letter])
             print(freq[letter])
             print(percLoc)
-        score = score * percLoc * hist[letter][6]
+        score = round(score * percLoc * hist[letter][6], 4)
         pos = pos + 1
     return score
     # % total occurrence * (% occur in specific location / 2)
